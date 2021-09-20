@@ -6,6 +6,14 @@ from django.db.models import fields
 from authentication_app import models
 
 
+
+CHOICES = (
+    ('', 'Add User Type Here'),
+    ('Student', 'Student'),
+    ('Parent ', 'Parent '),
+    ('Teacher', 'Teacher'),
+    )
+
 # class SignupForm(UserCreationForm):
 #     first_name = forms.CharField(required=True, label="",widget=forms.TextInput(attrs={'placeholder':'First Name','class':'mb-2'}))
 #     last_name = forms.CharField(required=True, label="",widget=forms.TextInput(attrs={'placeholder':'Last Name','class':'mb-2'}))
@@ -19,11 +27,12 @@ from authentication_app import models
 
 
 class LoginForm(AuthenticationForm):
-    # username = forms.EmailField(required=True, label="",widget=forms.TextInput(attrs={'placeholder':'Email','class':'mb-3'}))
-    # password = forms.CharField(required=True, label="",widget=forms.PasswordInput(attrs={'placeholder':'Password','class':'mb-3'}))
+    username = forms.EmailField(required=True, label="",widget=forms.TextInput(attrs={'placeholder':'Email','class':'mb-3'}))
+    password = forms.CharField(required=True, label="",widget=forms.PasswordInput(attrs={'placeholder':'Password','class':'mb-3'}))
+    user_type = forms.ChoiceField(choices = CHOICES,required=True,label="",widget=forms.Select(attrs={'placeholder':'User Type','class':'mb-3'}))
     class Meta:
         model = models.User
-        fields = ('username','password')
+        fields = ('username','password','user_type')
 
 
 class ResetPasswordForm(PasswordResetForm):

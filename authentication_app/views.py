@@ -16,6 +16,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from django.views.generic import View
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from authentication_app import models
 
 # Create your views here.
 # def sign_up(request):
@@ -85,11 +86,21 @@ def log_in(request):
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
+            user_type = form.cleaned_data.get('user_type')
 
             user =  authenticate(username=username,password=password)
-            if user is not None:
-                login(request,user)
-                return HttpResponseRedirect(reverse('authentication_app:home'))
+            if(models.User.objects.filter(email=username,user_type=user_type).exists()):
+                # user =  authenticate(username=username,password=password)
+                if user is not None:
+                    login(request,user)
+                    return HttpResponseRedirect(reverse('authentication_app:home'))
+                else:
+                    messages.add_message(request,messages.INFO, 'No acocunt in this email! please create an account first')
+                    return HttpResponseRedirect(reverse('authentication_app:log_in'))
+            
+            else:
+                messages.add_message(request,messages.INFO, 'User type missmatch')
+                return HttpResponseRedirect(reverse('authentication_app:log_in'))
 
     diction = {'form':form}
     return render(request,'authentication_app/log_in.html',context=diction)
@@ -97,8 +108,17 @@ def log_in(request):
 
 @login_required
 def Home(request):
-    diction = {}
-    return render(request,'authentication_app/home.html')
+    user_type = ''
+    current_user = request.user
+    if current_user.user_type == 'Student':
+        return render(request,'authentication_app/student_home.html')
+
+    elif current_user.user_type == 'Parent':
+        return render(request,'authentication_app/teacher_home.html')
+
+    elif current_user.user_type == 'Teacher':
+        return render(request,'authentication_app/parent_home.html')
+    
 
 
 # class ActivateView(View):
